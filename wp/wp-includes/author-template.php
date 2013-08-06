@@ -38,7 +38,7 @@ function get_the_author($deprecated = '') {
  * still use the old behavior will also pass the value from get_the_author().
  *
  * The normal, expected behavior of this function is to echo the author and not
- * return it. However, backwards compatiability has to be maintained.
+ * return it. However, backwards compatibility has to be maintained.
  *
  * @since 0.71
  * @see get_the_author()
@@ -69,8 +69,7 @@ function the_author( $deprecated = '', $deprecated_echo = true ) {
  * @return string The author's display name.
  */
 function get_the_modified_author() {
-	global $post;
-	if ( $last_id = get_post_meta($post->ID, '_edit_last', true) ) {
+	if ( $last_id = get_post_meta( get_post()->ID, '_edit_last', true) ) {
 		$last_user = get_userdata($last_id);
 		return apply_filters('the_modified_author', $last_user->display_name);
 	}
@@ -96,25 +95,20 @@ function the_modified_author() {
  * @param int $user_id Optional. User ID.
  * @return string The author's field from the current author's DB object.
  */
-function get_the_author_meta($field = '', $user_id = false) {
-	if ( ! $user_id )
+function get_the_author_meta( $field = '', $user_id = false ) {
+	if ( ! $user_id ) {
 		global $authordata;
-	else
+		$user_id = isset( $authordata->ID ) ? $authordata->ID : 0;
+	} else {
 		$authordata = get_userdata( $user_id );
+	}
 
-	// Keys used as object vars cannot have dashes.
-	$field = str_replace('-', '', $field);
-	$field = strtolower($field);
-	$user_field = "user_$field";
+	if ( in_array( $field, array( 'login', 'pass', 'nicename', 'email', 'url', 'registered', 'activation_key', 'status' ) ) )
+		$field = 'user_' . $field;
 
-	if ( 'id' == $field )
-		$value = isset($authordata->ID) ? (int)$authordata->ID : 0;
-	elseif ( isset($authordata->$user_field) )
-		$value = $authordata->$user_field;
-	else
-		$value = isset($authordata->$field) ? $authordata->$field : '';
+	$value = isset( $authordata->$field ) ? $authordata->$field : '';
 
-	return apply_filters('get_the_author_' . $field, $value, $user_id);
+	return apply_filters( 'get_the_author_' . $field, $value, $user_id );
 }
 
 /**
@@ -140,7 +134,7 @@ function the_author_meta($field = '', $user_id = false) {
  */
 function get_the_author_link() {
 	if ( get_the_author_meta('url') ) {
-		return '<a href="' . get_the_author_meta('url') . '" title="' . esc_attr( sprintf(__("Visit %s&#8217;s website"), get_the_author()) ) . '" rel="external">' . get_the_author() . '</a>';
+		return '<a href="' . esc_url( get_the_author_meta('url') ) . '" title="' . esc_attr( sprintf(__("Visit %s&#8217;s website"), get_the_author()) ) . '" rel="author external">' . get_the_author() . '</a>';
 	} else {
 		return get_the_author();
 	}
@@ -169,8 +163,7 @@ function the_author_link() {
  * @return int The number of posts by the author.
  */
 function get_the_author_posts() {
-	global $post;
-	return count_user_posts($post->post_author);
+	return count_user_posts( get_post()->post_author );
 }
 
 /**
@@ -203,9 +196,11 @@ function the_author_posts_link($deprecated = '') {
 		_deprecated_argument( __FUNCTION__, '2.1' );
 
 	global $authordata;
+	if ( !is_object( $authordata ) )
+		return false;
 	$link = sprintf(
-		'<a href="%1$s" title="%2$s">%3$s</a>',
-		get_author_posts_url( $authordata->ID, $authordata->user_nicename ),
+		'<a href="%1$s" title="%2$s" rel="author">%3$s</a>',
+		esc_url( get_author_posts_url( $authordata->ID, $authordata->user_nicename ) ),
 		esc_attr( sprintf( __( 'Posts by %s' ), get_the_author() ) ),
 		get_the_author()
 	);
@@ -249,7 +244,7 @@ function get_author_posts_url($author_id, $author_nicename = '') {
  * <li>optioncount (boolean) (false): Show the count in parenthesis next to the
  * author's name.</li>
  * <li>exclude_admin (boolean) (true): Exclude the 'admin' user that is
- * installed bydefault.</li>
+ * installed by default.</li>
  * <li>show_fullname (boolean) (false): Show their full names.</li>
  * <li>hide_empty (boolean) (true): Don't show authors without any posts.</li>
  * <li>feed (string) (''): If isn't empty, show links to author's feeds.</li>
@@ -366,4 +361,32 @@ function wp_list_authors($args = '') {
 	echo $return;
 }
 
-?>
+/**
+ * Does this site have more than one author
+ *
+ * Checks to see if more than one author has published posts.
+ *
+ * @since 3.2.0
+ * @return bool Whether or not we have more than one author
+ */
+function is_multi_author() {
+	global $wpdb;
+
+	if ( false === ( $is_multi_author = get_transient( 'is_multi_author' ) ) ) {
+		$rows = (array) $wpdb->get_col("SELECT DISTINCT post_author FROM $wpdb->posts WHERE post_type = 'post' AND post_status = 'publish' LIMIT 2");
+		$is_multi_author = 1 < count( $rows ) ? 1 : 0;
+		set_transient( 'is_multi_author', $is_multi_author );
+	}
+
+	return apply_filters( 'is_multi_author', (bool) $is_multi_author );
+}
+
+/**
+ * Helper function to clear the cache for number of authors.
+ *
+ * @private
+ */
+function __clear_multi_author_cache() {
+	delete_transient( 'is_multi_author' );
+}
+add_action('transition_post_status', '__clear_multi_author_cache');
