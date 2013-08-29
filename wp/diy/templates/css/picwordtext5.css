@@ -1,0 +1,22 @@
+.picwordtext5{
+margin:0;
+padding:0;
+}
+
+.picwordtext5 .pic{
+display:block;
+float:left;
+padding:2px;
+margin:3px 12px 5px 0;
+border:0;
+}
+
+.picwordtext5 .pic img{
+border:0;
+}
+
+.picwordtext5  .memo{
+font:12px/23px simsun,Arial;
+color:#505050;
+text-indent:2em;
+}
