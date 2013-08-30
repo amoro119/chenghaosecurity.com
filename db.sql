@@ -3,7 +3,7 @@
 -- http://www.phpmyadmin.net
 --
 -- 主机: localhost
--- 生成日期: 2013 年 08 月 30 日 04:53
+-- 生成日期: 2013 年 08 月 30 日 05:55
 -- 服务器版本: 5.1.41
 -- PHP 版本: 5.3.1
 
@@ -16,10 +16,8 @@ SET SQL_MODE="NO_AUTO_VALUE_ON_ZERO";
 /*!40101 SET NAMES utf8 */;
 
 --
--- 数据库: `chenghaosecurity.com`
+-- 数据库: `chenghaosecurity_com`
 --
-CREATE DATABASE `chenghaosecurity.com` DEFAULT CHARACTER SET latin1 COLLATE latin1_swedish_ci;
-USE `chenghaosecurity.com`;
 
 -- --------------------------------------------------------
 
@@ -128,7 +126,7 @@ CREATE TABLE IF NOT EXISTS `wp_options` (
   `autoload` varchar(20) NOT NULL DEFAULT 'yes',
   PRIMARY KEY (`option_id`),
   UNIQUE KEY `option_name` (`option_name`)
-) ENGINE=MyISAM  DEFAULT CHARSET=utf8 AUTO_INCREMENT=231 ;
+) ENGINE=MyISAM  DEFAULT CHARSET=utf8 AUTO_INCREMENT=218 ;
 
 --
 -- 转存表中的数据 `wp_options`
@@ -316,7 +314,7 @@ CREATE TABLE IF NOT EXISTS `wp_postmeta` (
   PRIMARY KEY (`meta_id`),
   KEY `post_id` (`post_id`),
   KEY `meta_key` (`meta_key`)
-) ENGINE=MyISAM  DEFAULT CHARSET=utf8 AUTO_INCREMENT=250 ;
+) ENGINE=MyISAM  DEFAULT CHARSET=utf8 AUTO_INCREMENT=247 ;
 
 --
 -- 转存表中的数据 `wp_postmeta`
@@ -610,6 +608,35 @@ INSERT INTO `wp_posts` (`ID`, `post_author`, `post_date`, `post_date_gmt`, `post
 -- --------------------------------------------------------
 
 --
+-- 表的结构 `wp_terms`
+--
+
+CREATE TABLE IF NOT EXISTS `wp_terms` (
+  `term_id` bigint(20) unsigned NOT NULL AUTO_INCREMENT,
+  `name` varchar(200) NOT NULL DEFAULT '',
+  `slug` varchar(200) NOT NULL DEFAULT '',
+  `term_group` bigint(10) NOT NULL DEFAULT '0',
+  PRIMARY KEY (`term_id`),
+  UNIQUE KEY `slug` (`slug`),
+  KEY `name` (`name`)
+) ENGINE=MyISAM  DEFAULT CHARSET=utf8 AUTO_INCREMENT=8 ;
+
+--
+-- 转存表中的数据 `wp_terms`
+--
+
+INSERT INTO `wp_terms` (`term_id`, `name`, `slug`, `term_group`) VALUES
+(1, '未分类', '%e6%9c%aa%e5%88%86%e7%b1%bb', 0),
+(2, '链接表', '%e9%93%be%e6%8e%a5%e8%a1%a8', 0),
+(3, 'primary', 'primary', 0),
+(4, 'sidebar', 'sidebar', 0),
+(5, '电子围栏', '%e7%94%b5%e5%ad%90%e5%9b%b4%e6%a0%8f', 0),
+(6, '硬盘录像机', '%e7%a1%ac%e7%9b%98%e5%bd%95%e5%83%8f%e6%9c%ba', 0),
+(7, '新闻动态', 'xinwendongtai', 0);
+
+-- --------------------------------------------------------
+
+--
 -- 表的结构 `wp_term_relationships`
 --
 
@@ -680,35 +707,6 @@ INSERT INTO `wp_term_taxonomy` (`term_taxonomy_id`, `term_id`, `taxonomy`, `desc
 (5, 5, 'category', '', 0, 2),
 (6, 6, 'category', '', 0, 1),
 (7, 7, 'category', '', 0, 2);
-
--- --------------------------------------------------------
-
---
--- 表的结构 `wp_terms`
---
-
-CREATE TABLE IF NOT EXISTS `wp_terms` (
-  `term_id` bigint(20) unsigned NOT NULL AUTO_INCREMENT,
-  `name` varchar(200) NOT NULL DEFAULT '',
-  `slug` varchar(200) NOT NULL DEFAULT '',
-  `term_group` bigint(10) NOT NULL DEFAULT '0',
-  PRIMARY KEY (`term_id`),
-  UNIQUE KEY `slug` (`slug`),
-  KEY `name` (`name`)
-) ENGINE=MyISAM  DEFAULT CHARSET=utf8 AUTO_INCREMENT=8 ;
-
---
--- 转存表中的数据 `wp_terms`
---
-
-INSERT INTO `wp_terms` (`term_id`, `name`, `slug`, `term_group`) VALUES
-(1, '未分类', '%e6%9c%aa%e5%88%86%e7%b1%bb', 0),
-(2, '链接表', '%e9%93%be%e6%8e%a5%e8%a1%a8', 0),
-(3, 'primary', 'primary', 0),
-(4, 'sidebar', 'sidebar', 0),
-(5, '电子围栏', '%e7%94%b5%e5%ad%90%e5%9b%b4%e6%a0%8f', 0),
-(6, '硬盘录像机', '%e7%a1%ac%e7%9b%98%e5%bd%95%e5%83%8f%e6%9c%ba', 0),
-(7, '新闻动态', 'xinwendongtai', 0);
 
 -- --------------------------------------------------------
 
